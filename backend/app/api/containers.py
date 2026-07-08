@@ -121,9 +121,16 @@ def delete_box(box_id: int, db: Session = Depends(get_db), current_user: User = 
 
 	if box is None:
 		raise HTTPException(
-			status_code = 404,
+			status_code = 400,
 			detail="Box not found"
 			)
+	existing_item = db.query(Item).filter(Item.box_id == box_id).first()
+
+	if existing_item is not None:
+	    raise HTTPException(
+	        status_code=400,
+	        detail="Box contains items. Delete items to continue."
+	    )
 
 	db.delete(box)
 	db.commit()
